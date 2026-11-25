@@ -8,6 +8,7 @@ import { CustomerDetail } from "./screens/CustomerDetail";
 import { Trust } from "./screens/Trust";
 import { More } from "./screens/More";
 import { PublicTrust } from "./screens/PublicTrust";
+import { PublicDebt } from "./screens/PublicDebt";
 
 export default function App() {
   return (
@@ -15,13 +16,14 @@ export default function App() {
       <Route path="/" element={<Welcome />} />
       <Route path="/home" element={<Home />} />
       <Route path="/scan" element={<Scan />} />
-      <Route path="/check" element={<CheckPage />} />
+      <Route path="/check/:id" element={<CheckPage />} />
       <Route path="/owed" element={<Owed />} />
       <Route path="/owed/:id" element={<CustomerDetail />} />
       <Route path="/trust" element={<Trust />} />
       <Route path="/more" element={<More />} />
       {/* public, no sign-in: opened from a QR, a WhatsApp link or a printed card */}
       <Route path="/t/:code" element={<PublicTrust />} />
+      <Route path="/d/:code" element={<PublicDebt />} />
     </Routes>
   );
 }

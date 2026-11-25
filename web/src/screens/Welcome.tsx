@@ -1,17 +1,57 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Mark, Wordmark } from "../components/Logo";
 import { Shell, Screen } from "../components/Shell";
-import { Button, LinkButton } from "../components/ui";
+import { Button } from "../components/ui";
 import { strings } from "../lib/strings";
+import { api } from "../lib/api";
 
 export function Welcome() {
   const navigate = useNavigate();
   const s = strings.welcome;
+  const [phone, setPhone] = useState("");
+  const [pin, setPin] = useState(["", "", "", ""]);
+  const [isNew, setIsNew] = useState(false);
+  const [name, setName] = useState("");
+  const [market, setMarket] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function onContinue(e: React.FormEvent) {
+  function setPinDigit(i: number, v: string) {
+    const digit = v.replace(/\D/g, "").slice(-1);
+    const next = [...pin];
+    next[i] = digit;
+    setPin(next);
+  }
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // T4 wires this to POST /api/auth/login
-    navigate("/home");
+    setError(null);
+    setBusy(true);
+    try {
+      if (isNew) {
+        await api.post("/auth/register", { phone, pin: pin.join(""), name, market });
+      } else {
+        await api.post("/auth/login", { phone, pin: pin.join("") });
+      }
+      navigate("/home");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onDemo() {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.post("/auth/demo");
+      navigate("/home");
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
+    }
   }
 
   return (
@@ -26,7 +66,7 @@ export function Welcome() {
           {s.title}
         </h1>
 
-        <form className="flex flex-col gap-4 relative z-[1]" onSubmit={onContinue}>
+        <form className="flex flex-col gap-4 relative z-[1]" onSubmit={onSubmit}>
           <label className="flex flex-col gap-1.5">
             <span className="text-[13px] font-semibold text-muted">{s.phone}</span>
             <input
@@ -34,6 +74,8 @@ export function Welcome() {
               name="phone"
               placeholder="080 000 0000"
               autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="h-11 border-0 border-b-[1.5px] border-line bg-transparent text-base focus:outline-none focus:border-brand"
             />
           </label>
@@ -41,13 +83,15 @@ export function Welcome() {
           <fieldset className="flex flex-col gap-1.5 border-0 p-0 m-0">
             <legend className="text-[13px] font-semibold text-muted px-0">{s.pin}</legend>
             <div className="flex gap-3">
-              {[1, 2, 3, 4].map((i) => (
+              {pin.map((d, i) => (
                 <label key={i} className="flex-1">
-                  <span className="sr-only">PIN digit {i}</span>
+                  <span className="sr-only">PIN digit {i + 1}</span>
                   <input
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
+                    value={d}
+                    onChange={(e) => setPinDigit(i, e.target.value)}
                     className="w-full h-12 text-center text-[22px] font-bold border-0 border-b-[1.5px] border-line bg-transparent focus:outline-none focus:border-brand"
                   />
                 </label>
@@ -55,9 +99,37 @@ export function Welcome() {
             </div>
           </fieldset>
 
-          <Button type="submit">{s.continue}</Button>
-          <Button type="button" variant="text" onClick={() => navigate("/home")}>
-            {s.newHere}
+          {isNew && (
+            <>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-[13px] font-semibold text-muted">Shop name</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-11 border-0 border-b-[1.5px] border-line bg-transparent text-base focus:outline-none focus:border-brand"
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-[13px] font-semibold text-muted">Market</span>
+                <input
+                  type="text"
+                  value={market}
+                  onChange={(e) => setMarket(e.target.value)}
+                  placeholder="Kuto, Itoku, Lafenwa..."
+                  className="h-11 border-0 border-b-[1.5px] border-line bg-transparent text-base focus:outline-none focus:border-brand"
+                />
+              </label>
+            </>
+          )}
+
+          {error && <p className="text-[13px] text-owed m-0">{error}</p>}
+
+          <Button type="submit" disabled={busy}>
+            {busy ? "Saving..." : s.continue}
+          </Button>
+          <Button type="button" variant="text" onClick={() => setIsNew((v) => !v)}>
+            {isNew ? "I already have a shop" : s.newHere}
           </Button>
         </form>
 
@@ -68,9 +140,9 @@ export function Welcome() {
           <span>{s.or}</span>
           <span className="flex-1 h-px bg-line" />
         </div>
-        <LinkButton to="/home" variant="outline">
+        <Button type="button" variant="outline" onClick={onDemo} disabled={busy}>
           {s.demo}
-        </LinkButton>
+        </Button>
         <p className="relative z-[1] text-center text-[13px] text-muted m-0">{s.demoShop}</p>
       </Screen>
     </Shell>
