@@ -55,7 +55,7 @@ export interface PageCheckResult {
 }
 
 /** quantity written as "2" or "2.5"; returns null if it will not parse as a plain number */
-function parseQuantity(raw: string | null | undefined): number | null {
+export function parseQuantity(raw: string | null | undefined): number | null {
   if (raw == null || raw.trim() === "") return null;
   const n = Number(raw.trim());
   return Number.isFinite(n) ? n : null;

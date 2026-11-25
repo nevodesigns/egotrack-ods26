@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { sql } from "../db.js";
 import { getAuthedShop } from "../lib/auth.js";
 import { readPage } from "../lib/ai-reader.js";
-import { checkPage, type ReaderLine } from "../checks/checks.js";
+import { checkPage, parseQuantity, type ReaderLine } from "../checks/checks.js";
 import { parseNaira } from "../checks/money.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -191,7 +191,7 @@ pages.post("/:id/confirm", async (c) => {
         insert into records (shop_id, branch_id, page_id, customer_id, item, quantity, unit_price, amount, kind, status, reason, confirmed)
         values (
           ${shop.id}, ${page.branch_id}, ${page.id}, ${customerId},
-          ${row.line.item ?? row.line.text}, ${row.line.quantity ?? null},
+          ${row.line.item ?? row.line.text}, ${parseQuantity(row.line.quantity)},
           ${unitPrice},
           ${row.amount}, ${kind}, ${row.status}, ${row.reason ?? null}, true
         )

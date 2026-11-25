@@ -19,6 +19,11 @@ const webDist = join(here, "..", "..", "web", "dist");
 
 const app = new Hono();
 
+app.onError((err, c) => {
+  console.error(err);
+  return c.json({ error: "We could not reach EgoTrack. Your work is saved on this phone." }, 500);
+});
+
 app.get("/health", async (c) => {
   const database = env.databaseUrl ? await pingDatabase() : false;
   return c.json({
