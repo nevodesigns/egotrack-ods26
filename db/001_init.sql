@@ -40,10 +40,12 @@ create table if not exists customers (
   shop_id uuid not null references shops(id) on delete cascade,
   name text not null,
   phone text,
-  created_at timestamptz not null default now(),
-  unique (shop_id, lower(name))
+  created_at timestamptz not null default now()
 );
 create index if not exists customers_shop_idx on customers(shop_id);
+-- a function call like lower(name) cannot go inside a plain UNIQUE table
+-- constraint in Postgres; it needs a real unique index instead.
+create unique index if not exists customers_shop_name_unique on customers (shop_id, lower(name));
 
 create table if not exists pages (
   id uuid primary key default gen_random_uuid(),
