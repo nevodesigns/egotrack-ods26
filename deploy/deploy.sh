@@ -4,5 +4,5 @@
 set -e
 cd "$(dirname "$0")/.."
 git pull
-docker compose -f deploy/docker-compose.yml up -d --build
-docker compose -f deploy/docker-compose.yml ps
+docker compose --env-file .env -f deploy/docker-compose.yml up -d --build
+docker compose --env-file .env -f deploy/docker-compose.yml ps
