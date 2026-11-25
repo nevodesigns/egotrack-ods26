@@ -21,7 +21,7 @@ export function Home() {
     async function load() {
       try {
         const [me, sum, ins] = await Promise.all([
-          api.get<{ shop: Shop }>("/me"),
+          api.get<{ shop: Shop }>("/auth/me"),
           api.get<Summary>("/summary"),
           api.get<Insights>("/summary/insights"),
         ]);
