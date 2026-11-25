@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/*
+  EgoTrack design tokens.
+  Source of truth: ~/odS_hack/plan/19_BRAND_AND_UX.md section 3 to 5.
+  Do not add colours, fonts or radii outside this list.
+*/
+@theme {
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-bg: #f6f7f4;
+  --color-surface: #ffffff;
+  --color-ink: #17201b;
+  --color-muted: #56615a;
+  --color-line: #dde3de;
+
+  --color-brand: #0b7a43;
+  --color-brand-strong: #075c32;
+  --color-brand-wash: #e3f2e8;
+
+  --color-owed: #b3261e;
+  --color-owed-wash: #fbe9e7;
+
+  --color-warn: #8a5a00;
+  --color-warn-bg: #fff3d6;
+
+  --color-left: #56615a;
+  --color-left-bg: #eef0ed;
+
+  --radius-card: 12px;
+  --radius-chip: 999px;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  /* numbers always line up: ₦184,500 should never jiggle */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* a faint nod to notebook paper, used only where the story calls for it
+   (Welcome, Home, Check the page, the public trust page). Never everywhere. */
+.ruled-paper {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 31px,
+    var(--color-line) 31px,
+    var(--color-line) 32px
+  );
+  background-position: 0 2px;
+}
+
+.margin-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 30px;
+  width: 1px;
+  background: var(--color-line);
+}
